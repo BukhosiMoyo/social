@@ -5,4 +5,5 @@ app_name ="posts"
 
 urlpatterns = [
     path("", views.PostView, name="posts"),
+    path("liked/", views.LikeUnlike, name="liked-posts"),
 ]
