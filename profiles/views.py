@@ -1,3 +1,24 @@
 from django.shortcuts import render
 
-# Create your views here.
+from .models import Profile
+from .forms import ProfileModelForm
+
+
+def ProfileView(request):
+    profile = Profile.objects.get(user=request.user)
+    form = ProfileModelForm(request.POST or None, request.FILES or None, instance=profile)
+    confirm  = False
+
+    if request.method == 'POST':
+        
+        if form.is_valid():
+            form.save
+            confirm = True
+
+
+    context = {
+        "profile": profile,
+        "form": form,
+        "confirm": confirm,
+    }
+    return render(request, 'profiles/my-profile.html', context)
