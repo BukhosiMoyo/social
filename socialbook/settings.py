@@ -38,9 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Third party libraries
+    "tailwind",
+    "theme",
+
     # Local Apps
     "profiles.apps.ProfilesConfig",
     "posts.apps.PostsConfig",
+]
+
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 MIDDLEWARE = [
@@ -124,13 +134,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [BASE_DIR / "static_project"]
+STATICFILES_DIRS = [BASE_DIR/"static_project"]
 
 STATIC_ROOT = (BASE_DIR/"static_cdn"/"static_root")
 
 MEDIA_URL = "/media/"
 
-MEDIA_ROOT = (BASE_DIR / "static_cdn" / "media_root")
+MEDIA_ROOT = (BASE_DIR/"static_cdn"/"media_root")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
