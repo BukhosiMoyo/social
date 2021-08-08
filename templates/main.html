@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+{% endblock title %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+    <div class="flex flex-wrap items-center justify-center h-24 mx-auto">
+        <div class="grid grid-cols-3 lg:grid-cols-5 xl:grid-cols-7">
+
+            <!--Column 1-->
+            <div class="col-span-2 bg-blue-300 rounded-lg p-4 mr-2">Side bar</div>
+
+            <!--Column 2-->
+            <div class="col-span-3 border-l border-r border-gray-200">
+                {% include "posts/create-post.html" %}
+                {% include "posts/post.html" %}
+                </div>
+
+            <!--Column 3-->
+            <div class="col-span-2 bg-red-300 rounded-lg p-4 ml-2">{{profile}}</div>
+        </div>
+    </div>
+
+{% endblock content %}
