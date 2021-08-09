@@ -2,6 +2,31 @@ from django.db import models
 from django.contrib.auth.models import User
 from .utils import get_random_code
 from django.template.defaultfilters import slugify
+from django.db.models import Q
+
+
+class ProfileManager(models.Manager):
+
+    def get_all_profiles_to_invite(self, sender):
+        profiles = Profile.objects.all().exclude(user=sender)
+        profile = Profile.objects.get(user=sender)
+        qs = Relationship.objects.filter(Q(sender=profile) | Q(eceiver=profile))
+
+        print(qs)
+        
+        accepted = []
+        for rel in qs:
+            if rel.status == 'accepted':
+                accepted.append(rel.sender)
+                accepted.append(rel.receiver)
+        print(accepted)
+
+        available =[]
+
+        
+    def get_all_profiles(self, me):
+        profiles = Profile.objects.all().exclude(user=me)
+        return profiles
 
 
 class Profile(models.Model):
@@ -57,6 +82,13 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
 
+class RelationshipManager(models.Manager):
+    def invitations_received(self, receiver):
+        qs = Relationship.objects.filter(receiver=receiver, status="sent")
+        return qs
+
+
+
 class Relationship(models.Model):
 
     STATUS_CHOICES = (
@@ -69,6 +101,8 @@ class Relationship(models.Model):
     status = models.CharField(max_length=8, choices=STATUS_CHOICES)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    objects = RelationshipManager()
 
     def __str__(self):
         return f"{self.sender}-{self.receiver}-{self.status}"
