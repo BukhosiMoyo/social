@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .utils import get_random_code
 from django.template.defaultfilters import slugify
 from django.db.models import Q
 
@@ -10,10 +9,10 @@ class ProfileManager(models.Manager):
     def get_all_profiles_to_invite(self, sender):
         profiles = Profile.objects.all().exclude(user=sender)
         profile = Profile.objects.get(user=sender)
-        qs = Relationship.objects.filter(Q(sender=profile) | Q(eceiver=profile))
+        qs = Relationship.objects.filter(Q(sender=profile) | Q(receiver=profile))
 
         print(qs)
-        
+
         accepted = []
         for rel in qs:
             if rel.status == 'accepted':
@@ -21,9 +20,12 @@ class ProfileManager(models.Manager):
                 accepted.append(rel.receiver)
         print(accepted)
 
-        available =[]
+        available = [
+            profile for profile in profiles if profile not in accepted]
+        print(available)
 
-        
+        return available
+
     def get_all_profiles(self, me):
         profiles = Profile.objects.all().exclude(user=me)
         return profiles
@@ -41,6 +43,7 @@ class Profile(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    objects = ProfileManager()
 
     def __str__(self):
         return f"{self.user.username}-{self.created.strftime('%d-%m-%Y')}"
@@ -55,7 +58,7 @@ class Profile(models.Model):
         likes = self.like_set.all()
         total_likes = 0
         for item in likes:
-            if item.value=="Like":
+            if item.value == "Like":
                 total_likes += 1
         return total_likes
 
@@ -65,7 +68,6 @@ class Profile(models.Model):
         for item in posts:
             total_liked += item.likes.all().count()
         return total_liked
-
 
     def save(self, *args, **kwargs):
         ex = False
@@ -88,7 +90,6 @@ class RelationshipManager(models.Manager):
         return qs
 
 
-
 class Relationship(models.Model):
 
     STATUS_CHOICES = (
@@ -96,8 +97,10 @@ class Relationship(models.Model):
         ("accepted", "accepted"),
     )
 
-    sender = models.ForeignKey(Profile, related_name="sender", on_delete=models.CASCADE)
-    receiver = models.ForeignKey(Profile, related_name="receiver", on_delete=models.CASCADE)
+    sender = models.ForeignKey(
+        Profile, related_name="sender", on_delete=models.CASCADE)
+    receiver = models.ForeignKey(
+        Profile, related_name="receiver", on_delete=models.CASCADE)
     status = models.CharField(max_length=8, choices=STATUS_CHOICES)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
