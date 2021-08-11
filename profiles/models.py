@@ -13,11 +13,11 @@ class ProfileManager(models.Manager):
 
         print(qs)
 
-        accepted = []
+        accepted = set([])
         for rel in qs:
             if rel.status == 'accepted':
-                accepted.append(rel.sender)
-                accepted.append(rel.receiver)
+                accepted.add(rel.sender)
+                accepted.add(rel.receiver)
         print(accepted)
 
         available = [
